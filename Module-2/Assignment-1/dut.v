@@ -25,23 +25,20 @@ module axis_register#(parameter DATA_WIDTH=8)(
           m_axis_valid_reg<=1'b0;
           m_axis_last_reg<=1'b0;
         end
-      else if(s_axis_valid && s_axis_ready)
+      else if(s_axis_ready)
         begin
-          m_axis_data_reg<=s_axis_data;
-          m_axis_valid_reg<=1'b1;
-          m_axis_last_reg<=s_axis_last;
-        end
-      else
-        begin
-          m_axis_data_reg<=m_axis_data_reg;
-          m_axis_valid_reg<=1'b0;
-          m_axis_last_reg<=1'b0;
+          m_axis_valid_reg<=s_axis_valid;
+          if(s_axis_valid)
+            begin
+              m_axis_data_reg<=s_axis_data;
+              m_axis_last_reg<=s_axis_last;
+            end
         end
     end
-  assign m_axis_data=m_axis_ready?m_axis_data_reg:0;
-  assign m_axis_valid=m_axis_ready && m_axis_data!=0;
+  assign m_axis_data=m_axis_data_reg;
+  assign m_axis_valid=m_axis_valid_reg;
   assign m_axis_last=m_axis_last_reg;
-  assign s_axis_ready=m_axis_ready;
+  assign s_axis_ready=~m_axis_valid_reg || m_axis_ready;
 
   
   

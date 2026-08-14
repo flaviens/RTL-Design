@@ -34,24 +34,15 @@ module axis_mux2_1#(parameter DATA_WIDTH=16)(
           m_axis_valid_reg<=1'b0;
           m_axis_last_reg<=1'b0;
         end
-      else if(~select)
+      else if(~m_axis_valid_reg || m_axis_ready)
         begin
-          if(s_axis_ready1 && s_axis_valid1)
+          if(~select && s_axis_valid1)
             begin
               m_axis_data_reg<=s_axis_data1;
               m_axis_valid_reg<=1'b1;
               m_axis_last_reg<=s_axis_last1;
             end
-          else
-            begin
-              m_axis_data_reg<=m_axis_data_reg;
-              m_axis_valid_reg<=1'b0;
-              m_axis_last_reg<=1'b0;
-            end
-        end
-      else if(select)
-        begin
-          if(s_axis_valid2 && s_axis_ready2)
+          else if(select && s_axis_valid2)
             begin
               m_axis_data_reg<=s_axis_data2;
               m_axis_valid_reg<=1'b1;
@@ -59,14 +50,13 @@ module axis_mux2_1#(parameter DATA_WIDTH=16)(
             end
           else
             begin
-              m_axis_data_reg<=m_axis_data_reg;
               m_axis_valid_reg<=1'b0;
               m_axis_last_reg<=1'b0;
             end
-          end
+        end
     end
-  assign s_axis_ready1=m_axis_ready;
-  assign s_axis_ready2=m_axis_ready;
+  assign s_axis_ready1=~select && (~m_axis_valid_reg || m_axis_ready);
+  assign s_axis_ready2=select && (~m_axis_valid_reg || m_axis_ready);
   assign m_axis_data=m_axis_data_reg;
   assign m_axis_valid=m_axis_valid_reg;
   assign m_axis_last=m_axis_last_reg;
