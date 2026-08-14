@@ -33,6 +33,8 @@ module axis_register#(parameter DATA_WIDTH=8)(
               m_axis_data_reg<=s_axis_data;
               m_axis_last_reg<=s_axis_last;
             end
+          else
+            m_axis_last_reg<=1'b0;
         end
     end
   assign m_axis_data=m_axis_data_reg;
