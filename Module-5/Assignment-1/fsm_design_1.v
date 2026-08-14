@@ -172,7 +172,7 @@ module fsm_design1#(parameter DATA_WIDTH=16)(
   always@(posedge clk)
     begin
       wr_ptr1<=wr_ptr;
-      if(s_axis_last==1)
+      if(s_axis_last && s_axis_valid && s_axis_ready)
         begin
           temp<=wr_ptr;
           temp1<=wr_ptr+next_state;
@@ -183,7 +183,14 @@ module fsm_design1#(parameter DATA_WIDTH=16)(
   
   always@(posedge clk)
     begin
-      if(rd_en && m_axis_ready)begin
+      if(reset)
+        begin
+          m_axis_data<=0;
+          m_axis_valid<=0;
+          m_axis_last<=0;
+          m_axis_keep<=0;
+        end
+      else if(rd_en && (!m_axis_valid || m_axis_ready))begin
         if(temp1 == rd_ptr ) 
           begin
             temp1<=0;
@@ -243,7 +250,7 @@ module fsm_design1#(parameter DATA_WIDTH=16)(
             
       end
       
-      else
+      else if(!m_axis_valid || m_axis_ready)
         begin
             m_axis_data<=0;
             m_axis_valid<=0;
