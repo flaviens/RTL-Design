@@ -170,6 +170,7 @@ module fsm_design_2#(parameter DATA_WIDTH=16)(
           block_last<=0;
         end
       else if(rd_en && (!m_axis_valid || m_axis_ready))begin
+        m_axis_last<=0;
         if(temp1 == rd_ptr ) 
           begin
             temp1<=0;
